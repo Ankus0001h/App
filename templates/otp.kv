@@ -1,0 +1,169 @@
+#:import utils kivy.utils
+
+<OtpScreen>:
+    canvas.before:
+        Color:
+            rgba: utils.get_color_from_hex('#F1F5F9')  # Soft Slate Background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        # Central Main OTP Elevation Card
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            width: dp(350)
+            height: dp(420)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            padding: [dp(22), dp(22)]
+            spacing: dp(10)
+            
+            canvas.before:
+                # Outer Soft Shadow
+                Color:
+                    rgba: 0, 0, 0, 0.04
+                RoundedRectangle:
+                    pos: self.x - dp(2), self.y - dp(4)
+                    size: self.width + dp(4), self.height + dp(6)
+                    radius: [dp(22)]
+                # Subtle Border
+                Color:
+                    rgba: utils.get_color_from_hex('#E2E8F0')
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [dp(20)]
+                # Main White Container
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.x + 1, self.y + 1
+                    size: self.width - 2, self.height - 2
+                    radius: [dp(19)]
+
+            # Header Icon / Visual Badge
+            AnchorLayout:
+                size_hint_y: None
+                height: dp(55)
+                anchor_x: 'center'
+                anchor_y: 'center'
+                Image:
+                    source: 'assets/logo.jpeg'
+                    size_hint: None, None
+                    size: dp(50), dp(50)
+                    allow_stretch: True
+                    keep_ratio: True
+
+            # Main Header Title
+            Label:
+                text: 'Verify OTP'
+                font_size: '22sp'
+                bold: True
+                color: utils.get_color_from_hex('#0F172A')
+                size_hint_y: None
+                height: dp(26)
+                halign: 'center'
+                valign: 'middle'
+                
+            # Dynamic Phone Sub-title
+            Label:
+                id: phone_label
+                text: 'OTP sent to +91 ******'
+                font_size: '12sp'
+                color: utils.get_color_from_hex('#64748B')
+                size_hint_y: None
+                height: dp(20)
+                text_size: self.width, None
+                halign: 'center'
+                valign: 'middle'
+
+            # --- OTP INPUT FIELD ---
+            Label:
+                text: 'Enter 6-Digit Code'
+                font_size: '11sp'
+                bold: True
+                color: utils.get_color_from_hex('#334155')
+                size_hint_y: None
+                height: dp(16)
+                text_size: self.width, None
+                halign: 'left'
+
+            TextInput:
+                id: otp_input
+                hint_text: '• • • • • •'
+                hint_text_color: utils.get_color_from_hex('#94A3B8')
+                multiline: False
+                write_tab: False
+                input_filter: 'int'
+                input_type: 'number'
+                size_hint_y: None
+                height: dp(45)
+                font_size: '18sp'
+                bold: True
+                halign: 'center'
+                cursor_color: utils.get_color_from_hex('#0B8733')
+                foreground_color: utils.get_color_from_hex('#0F172A')
+                padding: [dp(10), dp(10), dp(10), dp(10)]
+                background_normal: ''
+                background_active: ''
+                background_color: utils.get_color_from_hex('#F8FAFC')
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#CBD5E1')
+                    Line:
+                        rounded_rectangle: (self.x, self.y, self.width, self.height, dp(8))
+                        width: 1
+
+            # Error Display Label
+            Label:
+                id: error_label
+                text: ''
+                color: utils.get_color_from_hex('#EF4444')
+                font_size: '11sp'
+                size_hint_y: None
+                height: dp(16)
+                text_size: self.width, None
+                halign: 'center'
+
+            # Primary CTA Button
+            Button:
+                text: 'Verify & Proceed'
+                size_hint_y: None
+                height: dp(46)
+                background_color: 0, 0, 0, 0
+                background_normal: ''
+                color: 1, 1, 1, 1
+                bold: True
+                font_size: '14.5sp'
+                on_release: root.verify_otp()
+                canvas.before:
+                    Color:
+                        rgba: utils.get_color_from_hex('#0B8733')  # Fresh Grocery Green
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [dp(10)]
+
+            # Secondary Back Button
+            Button:
+                text: "Wrong Number? [color=#0B8733][b]Change[/b][/color]"
+                markup: True
+                size_hint_y: None
+                height: dp(30)
+                background_color: 0, 0, 0, 0
+                background_normal: ''
+                color: utils.get_color_from_hex('#64748B')
+                font_size: '12.5sp'
+                on_release: 
+                    app.root.current = 'login'
+                    app.root.transition.direction = 'right'
+
+        # Safely Hidden Loading Overlay (Will NOT block clicks)
+        LoadingOverlay:
+            id: loading_overlay
+            opacity: 0
+            disabled: True
+            size_hint: None, None
+            size: 0, 0
+            pos_hint: {'x': 2, 'y': 2}

@@ -1,0 +1,19 @@
+#:import utils kivy.utils
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        
+        canvas.before:
+            Color:
+                rgba: utils.get_color_from_hex('#F3F4F6')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                
+        Label:
+            text: 'Welcome to Jippy Store Home!'
+            font_size: '24sp'
+            bold: True
+            color: utils.get_color_from_hex('#0B8733')
