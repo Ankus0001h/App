@@ -22,7 +22,6 @@ source.include_patterns = templates/*.kv, assets/*
 version = 0.1
 
 # (list) Application requirements
-# Note: Add all python modules used in app.py
 requirements = python3,kivy,requests,pymongo,dnspython,urllib3,chardet,idna,certifi
 
 # (str) Main entry point script
@@ -31,12 +30,13 @@ source.filename = app.py
 # (list) Permissions
 android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
-# (str) Target Android API
+# (str) Target Android API & SDK/NDK Configuration (Fixes aidl Issue)
 android.api = 33
 android.minapi = 21
-
-# (str) Android NDK version
+android.sdk = 33
+android.build_tools_version = 33.0.2
 android.ndk = 25b
+android.accept_sdk_license = True
 
 # (bool) Use --private data dir (True) or --dir public storage (False)
 android.private_data = True
@@ -44,7 +44,7 @@ android.private_data = True
 # (str) Android logcat filters to use
 android.logcat_filters = *:S python:D
 
-# (list) List of Android architectures to build for
+# (list) List of Android architectures to build for (Google Play Standard)
 android.archs = arm64-v8a, armeabi-v7a
 
 # (str) Build artifact format (.aab for Google Play Store)
