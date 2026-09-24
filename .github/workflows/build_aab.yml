@@ -36,7 +36,10 @@ jobs:
           zlib1g-dev \
           openjdk-17-jdk \
           unzip \
-          zip
+          zip \
+          lib32z1 \
+          lib32stdc++6 \
+          android-sdk
 
     - name: Install Buildozer and Cython
       run: |
