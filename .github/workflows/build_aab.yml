@@ -7,42 +7,73 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    env:
+      APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install System Dependencies
         run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf automake m4 libtool libtool-bin pkg-config zlib1g-dev libncurses-dev libtinfo-dev cmake libffi-dev libssl-dev
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip \
+            openjdk-17-jdk \
+            python3-pip \
+            autoconf automake m4 libtool libtool-bin \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev libncursesw5-dev \
+            libtinfo-dev \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            lld \
+            ccache
 
-      - name: Install Buildozer & Dependencies
+      - name: Install Buildozer & Python Dependencies
         run: |
           pip install --upgrade pip setuptools wheel
-          pip install buildozer "cython<3.0.0" virtualenv
+          pip install "cython<3.0.0" virtualenv
+          pip install buildozer
 
-      - name: Accept Android SDK Licenses & Build AAB
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
+
+      - name: Build AAB
         run: |
-          # The 'yes |' command automatically accepts the Android SDK licenses prompted by buildozer
-          yes | buildozer android release
+          set -e
+          yes | buildozer android release 2>&1 | tee buildozer_full.log
+        env:
+          ANDROIDSDK: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
+          ANDROIDNDK: ${{ github.workspace }}/.buildozer/android/platform/android-ndk-r25b
+          ANDROIDAPI: "34"
+          ANDROIDMINAPI: "24"
 
       - name: Upload Unsigned AAB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: JippyStore-Release-AAB
           path: bin/*.aab
-          
-      - name: Upload APK for Testing (Optional)
-        # This uploads the APK if you change `android.release_artifact = apk` in buildozer.spec for testing
+
+      - name: Upload Build Log on Failure
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
-          name: JippyStore-Release-APK
-          path: bin/*.apk
+          name: buildozer-failure-log
+          path: buildozer_full.log
