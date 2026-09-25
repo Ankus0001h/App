@@ -12,17 +12,22 @@ package.domain = com.jippystore.app
 # (str) Source code where the main.py or app.py lives
 source.dir = .
 
-# (list) Source files to include (including kv files in templates)
+# (list) Source files to include (let buildozer handle extensions and our specific folders)
 source.include_exts = py,png,jpg,jpeg,kv,atlas
-
-# (list) List of inclusions using pattern matching
-source.include_patterns = templates/*.kv, assets/*
+source.include_patterns = assets/*,templates/*
 
 # (str) Application versioning
-version = 0.1
+version = 1.0
 
 # (list) Application requirements
-requirements = python3,kivy,requests,pymongo,dnspython,urllib3,chardet,idna,certifi
+# Note: pymongo needs dnspython to parse mongodb+srv:// URLs
+requirements = python3,kivy==2.3.0,requests,pymongo,dnspython
+
+# (str) Supported orientations (landscape, sensor, portrait, etc.)
+orientation = portrait
+
+# (bool) Indicate if the application should be fullscreen or not
+fullscreen = 0
 
 # (str) Main entry point script
 source.filename = app.py
@@ -30,24 +35,22 @@ source.filename = app.py
 # (list) Permissions
 android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
-# (str) Target Android API & SDK/NDK Configuration (Fixes aidl Issue)
-android.api = 33
-android.minapi = 21
-android.sdk = 33
-android.build_tools_version = 33.0.2
+# (str) Target Android API (Play Store currently requires API 34)
+android.api = 34
+
+# (str) Minimum API your APK / AAB will support. API 24 is Android 7.0
+android.minapi = 24
+
+# (str) Android NDK version to use
 android.ndk = 25b
-android.accept_sdk_license = True
 
 # (bool) Use --private data dir (True) or --dir public storage (False)
 android.private_data = True
 
-# (str) Android logcat filters to use
-android.logcat_filters = *:S python:D
-
-# (list) List of Android architectures to build for (Google Play Standard)
+# (list) List of Android architectures to build for (Play store needs both 64 and 32 bit)
 android.archs = arm64-v8a, armeabi-v7a
 
-# (str) Build artifact format (.aab for Google Play Store)
+# (str) Build artifact format (.aab for Google Play Store, .apk for testing)
 android.release_artifact = aab
 
 [buildozer]
@@ -55,8 +58,5 @@ android.release_artifact = aab
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
 log_level = 2
 
-# (str) Path to build work dir
-build_dir = ./.buildozer
-
-# (str) Path to build output (where .aab file will be saved)
-bin_dir = ./bin
+# (int) Display warning if buildozer is run as root (0 = False, 1 = True)
+warn_on_root = 0
