@@ -1,4 +1,4 @@
-name: Build Jippy Store Release AAB
+name: Build Android Release AAB
 
 on:
   push:
@@ -7,58 +7,42 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install System Dependencies
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          python3-dev \
-          libffi-dev \
-          git \
-          ffmpeg \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev \
-          libportmidi-dev \
-          libswscale-dev \
-          libavformat-dev \
-          libavcodec-dev \
-          zlib1g-dev \
-          openjdk-17-jdk \
-          unzip \
-          zip \
-          autoconf \
-          libtool \
-          pkg-config \
-          ccache \
-          libncurses5:i386 \
-          libstdc++6:i386 \
-          libgtk-3-dev
+      - name: Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
-    - name: Install Buildozer and Build Tools
-      run: |
-        pip install --upgrade pip setuptools wheel
-        pip install "cython<3.0.0" buildozer
+      - name: Install Buildozer & Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython virtualenv
 
-    - name: Build AAB with Buildozer
-      run: |
-        buildozer -s android release
+      - name: Accept Android SDK Licenses & Build AAB
+        run: |
+          # The 'yes |' command automatically accepts the Android SDK licenses prompted by buildozer
+          yes | buildozer android release
 
-    - name: Upload AAB Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: JippyStore-Release-AAB
-        path: bin/*.aab
+      - name: Upload Unsigned AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JippyStore-Release-AAB
+          path: bin/*.aab
+          
+      - name: Upload APK for Testing (Optional)
+        # This uploads the APK if you change `android.release_artifact = apk` in buildozer.spec for testing
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: JippyStore-Release-APK
+          path: bin/*.apk
