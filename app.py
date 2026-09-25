@@ -16,8 +16,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 template_path = os.path.join(current_dir, 'templates', 'main.kv')
 
 # --- CONFIGURATIONS ---
-MONGO_URI = "mongodb+srv://Ankush1076:Ankush%40210205@grocerydelivery.dfdl8sn.mongodb.net/grocery_app?retryWrites=true&w=majority"
-
+MONGO_URI =
 # GREEN API CREDENTIALS (ENTER YOURS HERE)
 GREEN_API_ID_INSTANCE = "710722692452"
 GREEN_API_TOKEN_INSTANCE = "c3a48ad406db49e9bb4b5215868c36cad110862d546f4b38a1"
